@@ -1,8 +1,10 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
+
 const { helpCommand } = require('./commands/helpCommand');
 const { secretCommand } = require('./commands/secretCommand');
+const { roll } = require('./commands/roll');
 
 const password = process.env.SECRET_PASSWORD;
 
@@ -27,15 +29,19 @@ client.on('message', async msg => {
     } else if (message.startsWith("!commands")) {
         msg.reply("d");
     } else if (message.startsWith("!addcommand")) {
-        msg.reply("d");
+        msg.reply("successfully added [command]");
+        console.log("[user] added [command]")
     } else if (message.startsWith("!deletecommand")) {
-        msg.reply("d");
+        msg.reply("successfully deleted [command]");
+        console.log("[user] deleted [command]")
     } else if (message.startsWith("!resetcommand")) {
         msg.reply("YOU THOUGHT LOL!");
     } else if (message.startsWith("!reset")) {
         msg.reply("d");
     } else if (message.trim() === "!secret") {
         msg.reply(secretCommand());
+    } else if (message.trim() === "!roll") {
+        msg.reply(roll());
     } else if (message.startsWith("!")) {
         msg.reply("Command not found, check !help.");
     }
