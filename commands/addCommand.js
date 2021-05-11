@@ -22,10 +22,33 @@ module.exports = {
             }
         };
 
+        async function isDuplicate(){
+            try {
+                let duplicate = false;
+                const listData = await dClient.scan(params).promise();
+                listData.Items.forEach((command) => {
+                    if (command.id === commandName) {
+                        console.log("Duplicate command.")
+                        duplicate = true;
+                    }
+                });
+                return duplicate;
+            } catch (err) {
+                console.log("Cannot Scan due to -> " + err)
+                return "Cannot add command"; 
+            }
+        };
+
         try {
-            const data = await dClient.put(params).promise();
-            console.log("Successfully added " + params + " to db!")
-            return "Successfully added !" + commandName;
+            let reply = "Command already exists! Check !commands.";
+            const duplicate = await isDuplicate();
+            if (!duplicate) {
+                const data = await dClient.put(params).promise();
+                console.log("Data: ", data)
+                console.log("Successfully added " + params.Item.id + " to db!")
+                reply = "Successfully added !" + commandName;
+            }
+            return reply;
         } catch (err) {
             console.log("Error: did not save due to -> " + err)
             return "Cannot add command";

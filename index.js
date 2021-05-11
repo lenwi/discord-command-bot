@@ -44,7 +44,7 @@ client.on('message', async msg => {
         const commandInfo = message.substr(message.indexOf(' ') + 1);
         const addCommandResp = await addCommand(commandInfo);
         msg.reply(addCommandResp).then(
-            () => console.log(msg.author.tag + " added: " + commandInfo)
+            () => console.log(msg.author.tag + " added?: " + commandInfo)
         ).catch(console.error);
     } else if (command === "!deletecommand") { //todo
         // msg.reply("successfully deleted [command]");
