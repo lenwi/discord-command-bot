@@ -7,6 +7,7 @@ const { secretCommand } = require('./commands/secretCommand');
 const { roll } = require('./commands/roll');
 const { addCommand } = require('./commands/addCommand');
 const { listCommands } = require('./commands/listCommands');
+const { deleteCommand } = require('./commands/deleteCommand');
 
 const password = process.env.SECRET_PASSWORD;
 
@@ -24,8 +25,6 @@ client.on('message', async msg => {
     const message = msg.content.toLowerCase();
     const args = message.split(' ');
     const command = message.substr(0, message.indexOf(' '));
-
-    console.log("Message: ", message)
 
     if (message.trim() === "!help") {
         msg.channel.send(helpCommand()).then(
@@ -46,16 +45,31 @@ client.on('message', async msg => {
         msg.reply(addCommandResp).then(
             () => console.log(msg.author.tag + " added?: " + commandInfo)
         ).catch(console.error);
-    } else if (command === "!deletecommand") { //todo
-        // msg.reply("successfully deleted [command]");
-        // console.log("[user] deleted [command]")
+    } else if (command === "!deletecommand") {
+        if (args.length !== 2) {
+            msg.reply("Invalid arguments, check !help.")
+            return;
+        }
+        const commandInfo = message.substr(message.indexOf(' ') + 1);
+        const deleteCommandResp = await deleteCommand(commandInfo);
+        msg.reply(deleteCommandResp).then(
+            () => console.log(msg.author.tag + " deleted?: " + commandInfo)
+        ).catch(console.error);
     } else if (command === "!resetcommand") {
         msg.reply("YOU THOUGHT LOL!");
-    } else if (command === "!reset") { //todo
-        if (command !== password) {
+    } else if (command === "!reset") {
+        if (args[1] !== password) {
             msg.reply("Wrong password.");
         } else {
-            console.log("dumped db")
+            const user = client.users.cache.find(user => user.username == "lenwi");
+            if (user) {
+                user.send("Check db table.").then(
+                    () => console.log("FLAG: dump db")
+                ).catch(console.error);
+            } else {
+                msg.channel.send("No user found.");
+                console.log("No user found.")
+            }
         }
     } else if (message.trim() === "!secret") {
         msg.channel.send(secretCommand()).then(
