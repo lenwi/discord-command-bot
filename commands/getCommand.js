@@ -11,11 +11,32 @@ const dClient = new aws.DynamoDB.DocumentClient();
 module.exports = {
     getCommand: async (commandId) => {
         commandId = commandId.substring(1);
-        const params = {
+        let params = {
             TableName: 'discord-command-bot',
             Key:{
                 "id": commandId
             },
+        };
+
+        async function increaseCounter(){
+            params = {
+                TableName: 'discord-command-bot',
+                Key:{
+                    "id": commandId,
+                },
+                UpdateExpression: "set #c = #c + :val",
+                ExpressionAttributeNames: {
+                    '#c': "counter"
+                },
+                ExpressionAttributeValues: {
+                    ":val": 1
+                }
+            };
+            try {
+                await dClient.update(params).promise();
+            } catch (err) {
+                console.log("Cannot update due to -> " + err)
+            }
         };
 
         try {
@@ -23,6 +44,11 @@ module.exports = {
             let reply = "Command not found, check !help.";
             if (Object.keys(res).length !== 0) {
                 reply = res.Item.commandData;
+                if (reply.includes("{count}")) {
+                    let acc = res.Item.counter;
+                    reply = reply.replace("{count}", ++acc);
+                    await increaseCounter();
+                }
             }
             return reply;
         } catch (err) {
