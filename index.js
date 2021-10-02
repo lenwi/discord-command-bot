@@ -8,6 +8,7 @@ const { roll } = require('./commands/roll');
 const { addCommand } = require('./commands/addCommand');
 const { listCommands } = require('./commands/listCommands');
 const { deleteCommand } = require('./commands/deleteCommand');
+const { getCommand } = require('./commands/getCommand');
 
 const password = process.env.SECRET_PASSWORD;
 
@@ -40,7 +41,7 @@ client.on('message', async msg => {
             msg.reply("Invalid arguments, check !help.")
             return;
         }
-        const commandInfo = message.substr(message.indexOf(' ') + 1);
+        const commandInfo = msg.content.substr(msg.content.indexOf(' ') + 1);
         const addCommandResp = await addCommand(commandInfo);
         msg.reply(addCommandResp).then(
             () => console.log(msg.author.tag + " added?: " + commandInfo)
@@ -83,8 +84,14 @@ client.on('message', async msg => {
         msg.channel.send("mama").then(
             () => console.log("joe success.")
         ).catch(console.error);
-    } else if (message.startsWith("!")) { //todo
-        // check table, if not exists -> error
-        msg.reply("Command not found, check !help.");
+    } else if (message.startsWith("!")) {
+        if (args.length !== 1) {
+            msg.reply("Invalid arguments, check !help.")
+            return;
+        }
+        const commandsResp = await getCommand(args[0]);
+        msg.channel.send(commandsResp).then(
+            () => console.log("!command success.")
+        ).catch(console.error);
     }
 });

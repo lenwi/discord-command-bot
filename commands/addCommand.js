@@ -44,7 +44,6 @@ module.exports = {
             const duplicate = await isDuplicate();
             if (!duplicate) {
                 const data = await dClient.put(params).promise();
-                console.log("Data: ", data)
                 console.log("Successfully added " + params.Item.id + " to db!")
                 reply = "Successfully added !" + commandName;
             }
